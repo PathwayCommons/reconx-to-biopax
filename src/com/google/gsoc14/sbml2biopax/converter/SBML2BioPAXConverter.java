@@ -63,8 +63,8 @@ public class SBML2BioPAXConverter {
             ListOf<SpeciesReference> listOfProducts = reaction.getListOfProducts();
             log.trace("- There are " + listOfProducts.size() + " products to this reaction. " +
                     "Adding them to the reaction as right participants.");
-            for (SpeciesReference reactantRef : listOfReactants) {
-                Species species = sbmlModel.getSpecies(reactantRef.getSpecies());
+            for (SpeciesReference productRef : listOfProducts) {
+                Species species = sbmlModel.getSpecies(productRef.getSpecies());
                 PhysicalEntity physicalEntity = sbml2BioPAXUtilities.convertSpecies(bpModel, species);
                 conversion.addRight(physicalEntity);
                 // TODO: add stiochiometry
@@ -78,6 +78,10 @@ public class SBML2BioPAXConverter {
 
         // Let's assign organism to every possible entity
         sbml2BioPAXUtilities.assignOrganism(bpModel);
+
+        // Some references do not have relationship entities in them
+        // Let's assign biomodels model id for them
+        sbml2BioPAXUtilities.assignRelationXrefs(bpModel);
 
         return bpModel;
     }
