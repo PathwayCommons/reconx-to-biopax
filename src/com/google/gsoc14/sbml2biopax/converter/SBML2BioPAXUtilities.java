@@ -56,9 +56,16 @@ public class SBML2BioPAXUtilities {
         }
 
         Conversion conversion = createBPEfromSBMLE(bpModel, rxnClass, reaction);
+        conversion.setConversionDirection(
+                reaction.getReversible()
+                        ? ConversionDirectionType.REVERSIBLE
+                        : ConversionDirectionType.LEFT_TO_RIGHT
+        );
+
         for (Xref xref : generateXrefsForSBase(bpModel, RelationshipXref.class, reaction)) {
             conversion.addXref(xref);
         }
+
         return conversion;
     }
 
@@ -76,7 +83,9 @@ public class SBML2BioPAXUtilities {
         // Interesting enough, these reference objects don't have an ID associated with them
         // That is why we are using hashcodes to generate unique BioPAX ID.
         String id = "control_" + modifierSpeciesReference.hashCode();
-        return createBPEfromSBMLE(bpModel, Control.class, modifierSpeciesReference, id);
+        Control control = createBPEfromSBMLE(bpModel, Control.class, modifierSpeciesReference, id);
+        control.setControlType(ControlType.ACTIVATION);
+        return control;
     }
 
     public <T extends SimplePhysicalEntity, S extends EntityReference> T convertSpeciesToSPE(Model bpModel, Class<T> entityClass, Class<S> refClass, Species species) {
