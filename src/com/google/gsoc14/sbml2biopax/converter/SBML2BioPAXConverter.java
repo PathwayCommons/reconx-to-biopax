@@ -55,7 +55,6 @@ public class SBML2BioPAXConverter {
                 Species species = sbmlModel.getSpecies(reactantRef.getSpecies());
                 PhysicalEntity physicalEntity = sbml2BioPAXUtilities.convertSpecies(bpModel, species);
                 conversion.addLeft(physicalEntity);
-                // TODO: add stiochiometry
             }
             // Reactants -> Left Participants [end]
 
@@ -67,7 +66,6 @@ public class SBML2BioPAXConverter {
                 Species species = sbmlModel.getSpecies(productRef.getSpecies());
                 PhysicalEntity physicalEntity = sbml2BioPAXUtilities.convertSpecies(bpModel, species);
                 conversion.addRight(physicalEntity);
-                // TODO: add stiochiometry
             }
             // Products -> Right Participants [end]
         }
@@ -82,6 +80,7 @@ public class SBML2BioPAXConverter {
         // Some references do not have relationship entities in them
         // Let's assign biomodels model id for them
         sbml2BioPAXUtilities.assignRelationXrefs(bpModel);
+
 
         return bpModel;
     }

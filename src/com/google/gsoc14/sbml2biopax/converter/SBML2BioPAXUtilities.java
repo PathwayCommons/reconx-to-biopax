@@ -80,16 +80,37 @@ public class SBML2BioPAXUtilities {
     }
 
     public <T extends SimplePhysicalEntity, S extends EntityReference> T convertSpeciesToSPE(Model bpModel, Class<T> entityClass, Class<S> refClass, Species species) {
-        T entity = createBPEfromSBMLE(bpModel, entityClass, species);
-        S reference = createBPEfromSBMLE(bpModel, refClass, species, "ref_" + species.getId());
-
-        // Append xrefs to the entity reference if they are not there
-        if(reference.getXref().isEmpty()) {
-            for (Xref xref : generateXrefsForSBase(bpModel, UnificationXref.class, species)) {
-                reference.addXref(xref);
+        Set<Xref> xrefs = generateXrefsForSBase(bpModel, UnificationXref.class, species);
+        HashSet<XReferrable> ers = new HashSet<XReferrable>();
+        for (Xref xref : xrefs) {
+            for (XReferrable xReferrable : xref.getXrefOf()) {
+                // Only add the entity references
+                if(xReferrable instanceof EntityReference) {
+                    ers.add(xReferrable);
+                }
             }
         }
 
+        S reference;
+        if(ers.isEmpty()) {
+            reference = createBPEfromSBMLE(bpModel, refClass, species, "ref_" + species.getId());
+            for (Xref xref : xrefs) {
+                reference.addXref(xref);
+            }
+        } else if(ers.size() == 1) { // There shouldn't be more than one
+            reference = (S) ers.iterator().next();
+        } else {
+            log.warn(
+                    "There are more than one EntityReferences that match with the same unification xref for species: "
+                            + species.getName()
+                            + ". Picking the first one: "
+                            + ers.iterator().next().getRDFId()
+            );
+
+            reference = (S) ers.iterator().next();
+        }
+
+        T entity = createBPEfromSBMLE(bpModel, entityClass, species);
         entity.setEntityReference(reference);
 
         return entity;
@@ -99,7 +120,7 @@ public class SBML2BioPAXUtilities {
         // Sample miriam resource: urn:miriam:chebi:CHEBI%3A15589
         String[] tokens = resource.split(":");
         T xref = bioPAXFactory.create(xrefClass, xrefId);
-        xref.setDb(tokens[2].replace("\\.", " "));
+        xref.setDb(tokens[2].replace(".", " "));
         String idToken = tokens[3];
         try {
             URI uri = new URI(idToken);
@@ -131,7 +152,8 @@ public class SBML2BioPAXUtilities {
 
     private <T extends Named> void setComments(AbstractNamedSBase abstractNamedSBase, T entity) {
         try {
-            entity.addComment(abstractNamedSBase.getNotesString());
+            // Strip out html tags
+            entity.addComment(abstractNamedSBase.getNotesString().replaceAll("\\<[^>]*>",""));
         } catch (XMLStreamException e) {
             log.warn("Problem parsing the notes XML: " + e.getLocalizedMessage());
         }
@@ -168,9 +190,10 @@ public class SBML2BioPAXUtilities {
             for (Xref xref : generateXrefsForSBase(bpModel, UnificationXref.class, compartment)) {
                 cellularLocationVocabulary.addXref(xref);
             }
+            bpModel.add(cellularLocationVocabulary);
         }
 
-        return null;
+        return cellularLocationVocabulary;
     }
 
     private Complex createComplexFromSpecies(Model bpModel, Species species) {
@@ -255,13 +278,13 @@ public class SBML2BioPAXUtilities {
             // These are the ones we were not able to capture from the model
             // Let's create proteins for them
             for (String name : names) {
-                String nameBasedURI = complex.getRDFId() + "_" + name;
+                String nameBasedURI = "protein_" + name;
                 Protein protein = bioPAXFactory.create(Protein.class, nameBasedURI);
                 protein.setDisplayName(name);
                 protein.setStandardName(name);
                 newBPEs.put(nameBasedURI, protein);
 
-                String refId = nameBasedURI + "_ref";
+                String refId = "ref_" + nameBasedURI;
                 ProteinReference proteinReference = (ProteinReference) newBPEs.get(refId);
                 if(proteinReference == null) {
                     proteinReference = bioPAXFactory.create(ProteinReference.class, refId);
@@ -328,4 +351,5 @@ public class SBML2BioPAXUtilities {
             }
         }
     }
+
 }
