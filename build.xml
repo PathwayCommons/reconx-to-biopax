@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="sbml2biopax" default="all">
+  
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*.orig/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.ear"/>
+    <include name="*.apk"/>
+    <include name="*.zip"/>
+    <include name="*.swc"/>
+    <include name="*.ane"/>
+    <include name="*.egg"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <include name="**/?*.properties"/>
+    <include name="**/?*.xml"/>
+    <include name="**/?*.gif"/>
+    <include name="**/?*.png"/>
+    <include name="**/?*.jpeg"/>
+    <include name="**/?*.jpg"/>
+    <include name="**/?*.html"/>
+    <include name="**/?*.dtd"/>
+    <include name="**/?*.tld"/>
+    <include name="**/?*.ftl"/>
+  </patternset>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.jsbml-1.0-b1-with-dependencies.classpath">
+    <pathelement location="${basedir}/lib/jsbml-1.0-b1-with-dependencies.jar"/>
+    <pathelement location="${basedir}/lib/paxtools-4.2.1-no-jena.jar"/>
+  </path>
+  
+  
+  <!-- Global Libraries -->
+  
+  
+  <!-- Application Server Libraries -->
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module sbml2biopax -->
+  
+  <dirname property="module.sbml2biopax.basedir" file="${ant.file}"/>
+  
+  
+  
+  <property name="compiler.args.sbml2biopax" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  
+  <property name="sbml2biopax.output.dir" value="${module.sbml2biopax.basedir}/out/production/sbml2biopax"/>
+  <property name="sbml2biopax.testoutput.dir" value="${module.sbml2biopax.basedir}/out/test/sbml2biopax"/>
+  <property name="sbml2biopax.jar.dir" value="${module.sbml2biopax.basedir}/out/jar/sbml2biopax"/>
+
+  <path id="sbml2biopax.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="sbml2biopax.module.production.classpath">
+    <path refid="library.jsbml-1.0-b1-with-dependencies.classpath"/>
+  </path>
+  
+  <path id="sbml2biopax.runtime.production.module.classpath">
+    <pathelement location="${sbml2biopax.output.dir}"/>
+    <path refid="library.jsbml-1.0-b1-with-dependencies.classpath"/>
+  </path>
+  
+  <path id="sbml2biopax.module.classpath">
+    <pathelement location="${sbml2biopax.output.dir}"/>
+    <path refid="library.jsbml-1.0-b1-with-dependencies.classpath"/>
+  </path>
+  
+  <path id="sbml2biopax.runtime.module.classpath">
+    <pathelement location="${sbml2biopax.testoutput.dir}"/>
+    <pathelement location="${sbml2biopax.output.dir}"/>
+    <path refid="library.jsbml-1.0-b1-with-dependencies.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.sbml2biopax">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.sbml2biopax">
+    <patternset refid="excluded.from.module.sbml2biopax"/>
+  </patternset>
+  
+  <path id="sbml2biopax.module.sourcepath">
+    <dirset dir="${module.sbml2biopax.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.sbml2biopax" depends="compile.module.sbml2biopax.production,compile.module.sbml2biopax.tests" description="Compile module sbml2biopax"/>
+  
+  <target name="compile.module.sbml2biopax.production" description="Compile module sbml2biopax; production classes">
+    <mkdir dir="${sbml2biopax.output.dir}"/>
+    <javac destdir="${sbml2biopax.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.sbml2biopax}"/>
+      <bootclasspath refid="sbml2biopax.module.bootclasspath"/>
+      <classpath refid="sbml2biopax.module.production.classpath"/>
+      <src refid="sbml2biopax.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.sbml2biopax"/>
+    </javac>
+    
+    <copy todir="${sbml2biopax.output.dir}">
+      <fileset dir="${module.sbml2biopax.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.sbml2biopax.tests" depends="compile.module.sbml2biopax.production" description="compile module sbml2biopax; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.sbml2biopax" description="cleanup module">
+    <delete dir="${sbml2biopax.output.dir}"/>
+    <delete dir="${sbml2biopax.testoutput.dir}"/>
+    <delete dir="${sbml2biopax.jar.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.sbml2biopax" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.sbml2biopax, jar" description="build all modules"/>
+
+  <target name="jar">
+        <mkdir dir="${sbml2biopax.jar.dir}"/>
+        <jar destfile="${sbml2biopax.jar.dir}/sbml2biopax.jar" basedir="${sbml2biopax.output.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="com.google.gsoc14.sbml2biopax.SBML2BioPAXMain"/>
+            </manifest>
+            <zipgroupfileset dir="${module.sbml2biopax.basedir}/lib" includes="**/*.jar" />
+        </jar>
+  </target>
+  
+  <target name="all" depends="build.modules" description="build all"/>
+</project>
