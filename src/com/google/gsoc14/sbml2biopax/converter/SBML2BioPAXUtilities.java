@@ -319,6 +319,7 @@ public class SBML2BioPAXUtilities {
             // Now, add all these proteins as components
             for (Protein component : components) {
                 complex.addComponent(component);
+                component.setCellularLocation(complex.getCellularLocation());
             }
         }
 
