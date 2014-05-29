@@ -71,7 +71,7 @@ public class SBML2BioPAXUtilities {
 
     public void setNames(AbstractNamedSBase namedSBase, Named named) {
         String name = namedSBase.getName();
-        if(name == null) {
+        if(name == null || name.toLowerCase().equals("null")) {
             name = "N/A";
         }
         named.setStandardName(name);
@@ -122,6 +122,13 @@ public class SBML2BioPAXUtilities {
         T entity = createBPEfromSBMLE(bpModel, entityClass, species);
         entity.setEntityReference(reference);
 
+        // Clean-up non-used xrefs
+        for (Xref xref : xrefs) {
+            if(xref.getXrefOf().isEmpty()) {
+                bpModel.remove(xref);
+            }
+        }
+
         return entity;
     }
 
@@ -129,7 +136,14 @@ public class SBML2BioPAXUtilities {
         // Sample miriam resource: urn:miriam:chebi:CHEBI%3A15589
         String[] tokens = resource.split(":");
         T xref = bioPAXFactory.create(xrefClass, xrefId);
-        xref.setDb(tokens[2].replace(".", " "));
+        // biomodels.db -> biomodels; ec-code -> ec code
+        String dataBase = tokens[2]
+                .replace(".", " ")
+                .replace("-", " ")
+                .replace(" db", " database")
+                .replace("obo ", "")
+        ;
+        xref.setDb(dataBase);
         String idToken = tokens[3];
         try {
             URI uri = new URI(idToken);
@@ -220,7 +234,7 @@ public class SBML2BioPAXUtilities {
 
         for (CVTerm cvTerm : annotation.getListOfCVTerms()) {
             for (String resource : cvTerm.getResources()) {
-                String xrefId = "xref_" + cvTerm.hashCode();
+                String xrefId = xrefClass.getSimpleName().toLowerCase() + "_" + cvTerm.hashCode();
                 // Let's not replicate xrefs if possible
                 Xref xref = (Xref) bpModel.getByID(xrefId);
                 if(xref == null) {
@@ -239,29 +253,13 @@ public class SBML2BioPAXUtilities {
     }
 
     public void fillComplexes(Model bpModel, org.sbml.jsbml.Model sbmlModel) {
-        // This is redundant operation, but should be pretty fast as look-ups prevent duplication
-        // and it will make sure we have all the species converted to BPEs
-        for (Species species : sbmlModel.getListOfSpecies()) {
-            convertSpecies(bpModel, species);
-        }
-
-        HashMap<String, Protein> xrefToProtein = new HashMap<String, Protein>();
-        HashSet<Protein> newProteins = new HashSet<Protein>();
+        HashMap<String, ProteinReference> xrefToProtein = new HashMap<String, ProteinReference>();
         // Now let's use xrefs to find the complex components
-        // First, find the proteins and map them with their xrefs
+        // First, find the proteinrefs and map them with their xrefs
         for (ProteinReference proteinRef : bpModel.getObjects(ProteinReference.class)) {
             for (Xref xref : proteinRef.getXref()) {
-                Protein protein = bioPAXFactory.create(Protein.class, "complex_" + proteinRef.getRDFId());
-                protein.setDisplayName(proteinRef.getDisplayName());
-                protein.setStandardName(proteinRef.getStandardName());
-                xrefToProtein.put(xref.toString(), protein);
-                protein.setEntityReference(proteinRef);
-                newProteins.add(protein);
+                xrefToProtein.put(xref.toString(), proteinRef);
             }
-        }
-        // Add all these new proteins to the model
-        for (Protein newProtein : newProteins) {
-            bpModel.add(newProtein);
         }
 
         // We have to work with a map not to create concurrency problems
@@ -269,17 +267,23 @@ public class SBML2BioPAXUtilities {
         HashMap<String, BioPAXElement> newBPEs = new HashMap<String, BioPAXElement>();
 
         // Now let's go to the complexes and see what xrefs they have
-        Set<Complex> complexes = bpModel.getObjects(Complex.class);
-
+        Set<Complex> complexes = new HashSet<Complex>(bpModel.getObjects(Complex.class));
         for (Complex complex : complexes) {
             HashSet<String> names = new HashSet<String>(Arrays.asList(complex.getDisplayName().split(":")));
 
             // Let's try to capture proteins from the model first
             HashSet<Protein> components = new HashSet<Protein>();
             for (Xref xref : complex.getXref()) {
-                Protein protein = xrefToProtein.get(xref.toString());
-                if(protein != null) {
-                    components.add(protein);
+                ProteinReference proteinRef = xrefToProtein.get(xref.toString());
+                if(proteinRef != null) {
+                    Protein protein = bioPAXFactory.create(Protein.class, complex.getRDFId() + "_" + proteinRef.getRDFId());
+                    protein.setDisplayName(proteinRef.getDisplayName());
+                    protein.setStandardName(proteinRef.getStandardName());
+                    protein.setEntityReference(proteinRef);
+                    if(!bpModel.containsID(protein.getRDFId())) {
+                        components.add(protein);
+                        bpModel.add(protein);
+                    }
                     names.remove(protein.getDisplayName());
                 }
             }
@@ -306,7 +310,7 @@ public class SBML2BioPAXUtilities {
                 UnificationXref unificationXref = (UnificationXref) newBPEs.get(xrefId);
                 if(unificationXref == null) {
                     unificationXref = bioPAXFactory.create(UnificationXref.class, xrefId);
-                    unificationXref.setDb("HUGO Symbol");
+                    unificationXref.setDb("HGNC Symbol");
                     unificationXref.setId(name);
                     newBPEs.put(xrefId, unificationXref);
                 }
