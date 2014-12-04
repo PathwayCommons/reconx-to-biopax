@@ -27,6 +27,20 @@ public class SBML2BioPAXUtilities {
         this.bioPAXFactory = bioPAXFactory;
     }
 
+    private String XMLBase = "http://www.humanmetabolism.org/#";
+
+    public String getXMLBase() {
+        return XMLBase;
+    }
+
+    public void setXMLBase(String XMLBase) {
+        this.XMLBase = XMLBase;
+    }
+
+    public String completeId(String partialId) {
+        return getXMLBase() + partialId;
+    }
+
     public Pathway convertPathway(Model bpModel, org.sbml.jsbml.Model sbmlModel) {
         Pathway pathway = createBPEfromSBMLE(bpModel, Pathway.class, sbmlModel);
         for (Xref xref : generateXrefsForSBase(bpModel, RelationshipXref.class, sbmlModel)) {
@@ -38,7 +52,7 @@ public class SBML2BioPAXUtilities {
     public Model createModel() {
         Model model = bioPAXFactory.createModel();
         // This could change, would be great to make this configurable
-        model.setXmlBase("http://www.humanmetabolism.org/#");
+        model.setXmlBase(getXMLBase());
         return model;
     }
 
@@ -82,7 +96,7 @@ public class SBML2BioPAXUtilities {
     public Control convertModifier(Model bpModel, ModifierSpeciesReference modifierSpeciesReference) {
         // Interesting enough, these reference objects don't have an ID associated with them
         // That is why we are using hashcodes to generate unique BioPAX ID.
-        String id = "control_" + modifierSpeciesReference.hashCode();
+        String id = completeId("control_" + modifierSpeciesReference.hashCode());
         Control control = createBPEfromSBMLE(bpModel, Control.class, modifierSpeciesReference, id);
         control.setControlType(ControlType.ACTIVATION);
         return control;
@@ -102,7 +116,7 @@ public class SBML2BioPAXUtilities {
 
         S reference;
         if(ers.isEmpty()) {
-            reference = createBPEfromSBMLE(bpModel, refClass, species, "ref_" + species.getId());
+            reference = createBPEfromSBMLE(bpModel, refClass, species, completeId("ref_" + species.getId()));
             for (Xref xref : xrefs) {
                 reference.addXref(xref);
             }
@@ -157,7 +171,7 @@ public class SBML2BioPAXUtilities {
     }
 
     public <T extends Named> T createBPEfromSBMLE(Model bpModel, Class<T> aClass, AbstractNamedSBase abstractNamedSBase) {
-        return createBPEfromSBMLE(bpModel, aClass, abstractNamedSBase, abstractNamedSBase.getId());
+        return createBPEfromSBMLE(bpModel, aClass, abstractNamedSBase, completeId(abstractNamedSBase.getId()));
     }
 
 
@@ -205,7 +219,7 @@ public class SBML2BioPAXUtilities {
     }
 
     public CellularLocationVocabulary createCompartment(Model bpModel, Compartment compartment) {
-        String id = compartment.getId();
+        String id = completeId(compartment.getId());
         CellularLocationVocabulary cellularLocationVocabulary = (CellularLocationVocabulary) bpModel.getByID(id);
         if(cellularLocationVocabulary == null) {
             cellularLocationVocabulary = bioPAXFactory.create(CellularLocationVocabulary.class, id);
@@ -234,7 +248,7 @@ public class SBML2BioPAXUtilities {
 
         for (CVTerm cvTerm : annotation.getListOfCVTerms()) {
             for (String resource : cvTerm.getResources()) {
-                String xrefId = xrefClass.getSimpleName().toLowerCase() + "_" + cvTerm.hashCode();
+                String xrefId = completeId(xrefClass.getSimpleName().toLowerCase() + "_" + cvTerm.hashCode());
                 // Let's not replicate xrefs if possible
                 Xref xref = (Xref) bpModel.getByID(xrefId);
                 if(xref == null) {
@@ -276,7 +290,8 @@ public class SBML2BioPAXUtilities {
             for (Xref xref : complex.getXref()) {
                 ProteinReference proteinRef = xrefToProtein.get(xref.toString());
                 if(proteinRef != null) {
-                    Protein protein = bioPAXFactory.create(Protein.class, complex.getRDFId() + "_" + proteinRef.getRDFId());
+                    String cProteinId = completeId(complex.getRDFId() + "_" + proteinRef.getRDFId());
+                    Protein protein = bioPAXFactory.create(Protein.class, cProteinId);
                     protein.setDisplayName(proteinRef.getDisplayName());
                     protein.setStandardName(proteinRef.getStandardName());
                     protein.setEntityReference(proteinRef);
@@ -291,13 +306,13 @@ public class SBML2BioPAXUtilities {
             // These are the ones we were not able to capture from the model
             // Let's create proteins for them
             for (String name : names) {
-                String nameBasedURI = "protein_" + name;
+                String nameBasedURI = completeId("protein_" + name);
                 Protein protein = bioPAXFactory.create(Protein.class, nameBasedURI);
                 protein.setDisplayName(name);
                 protein.setStandardName(name);
                 newBPEs.put(nameBasedURI, protein);
 
-                String refId = "ref_" + nameBasedURI;
+                String refId = completeId("ref_" + nameBasedURI);
                 ProteinReference proteinReference = (ProteinReference) newBPEs.get(refId);
                 if(proteinReference == null) {
                     proteinReference = bioPAXFactory.create(ProteinReference.class, refId);
@@ -306,7 +321,7 @@ public class SBML2BioPAXUtilities {
                     newBPEs.put(refId, proteinReference);
                 }
 
-                String xrefId = "symbol_" + name;
+                String xrefId = completeId("symbol_" + name);
                 UnificationXref unificationXref = (UnificationXref) newBPEs.get(xrefId);
                 if(unificationXref == null) {
                     unificationXref = bioPAXFactory.create(UnificationXref.class, xrefId);
@@ -338,10 +353,10 @@ public class SBML2BioPAXUtilities {
 
     public void assignOrganism(Model bpModel) {
         // Since this is RECON2, everything is human
-        BioSource bioSource = bioPAXFactory.create(BioSource.class, "source_human");
+        BioSource bioSource = bioPAXFactory.create(BioSource.class, completeId("source_human"));
         bioSource.setDisplayName("Homo sapiens");
         bioSource.setStandardName("Homo sapiens");
-        UnificationXref unificationXref = bioPAXFactory.create(UnificationXref.class, "xref_human_tax");
+        UnificationXref unificationXref = bioPAXFactory.create(UnificationXref.class, completeId("xref_human_tax"));
         unificationXref.setDb("taxonomy");
         unificationXref.setId("9606");
         bpModel.add(unificationXref);
@@ -354,7 +369,7 @@ public class SBML2BioPAXUtilities {
     }
 
     public void assignRelationXrefs(Model bpModel) {
-        RelationshipXref xref = bioPAXFactory.create(RelationshipXref.class, "relxref_biomodels");
+        RelationshipXref xref = bioPAXFactory.create(RelationshipXref.class, completeId("relxref_biomodels"));
         xref.setDb("BioModels");
         xref.setId("MODEL1109130000");
         bpModel.add(xref);
