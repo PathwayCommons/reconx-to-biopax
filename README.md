@@ -1,5 +1,5 @@
 # reconx-to-biopax
-Originated from https://bitbucket.org/armish/gsoc14 and will continue here.
+Originated from https://bitbucket.org/armish/gsoc14 and will continue here (ToDo).
 
 This is an SBML to BioPAX Level3 converter, specific to Recon2 data/model.
 
@@ -17,18 +17,18 @@ This being said, the converter was not making good use of all Paxtools utilities
 I first tried to modify the existing code, but stuck with library conflicts and was not able to resolve the problems.
 See the initial changesets starting from tag `base1` till `milestone1.1`.
 
-To keep things much simpler, I created a new project from the scratch under `Goal1-SBML2BioPAX/sbml2biopax`.
+To keep things much simpler, I (Arman) created a new project from the scratch under `Goal1-SBML2BioPAX/sbml2biopax`.
 This project depends on two libraries: Paxtools and JSBML.
 I implemented the converter so that this project can be used a library by other projects as well.
 The main class of this project, `SBML2BioPAXMain`, serves as an example to show how to use this API:
 
-	:::java
+	//java
 	// ...
 	SBMLDocument sbmlDocument = SBMLReader.read(new File(sbmlFile));
 	SBML2BioPAXConverter sbml2BioPAXConverter = new SBML2BioPAXConverter();
-    Model bpModel = sbml2BioPAXConverter.convert(sbmlDocument);
-    // where bpModel is the BioPAX model
-    // ...
+	Model bpModel = sbml2BioPAXConverter.convert(sbmlDocument);
+	// where bpModel is the BioPAX model
+	// ...
 
 During implementation, I tried to seperate utility methods and main flow as much as possible,
 so that we have all main conversion logic in the `SBML2BioPAXConverter` class and
@@ -59,9 +59,9 @@ Due to these issues, the current implementation is coupled to the Recon 2 model.
 Although it is possible to convert any other SBML model into BioPAX, the semantics might suffer depending on the annotation details in that particular model.
 
 ### Usage
-After checking out the repository, change your working directory to the [Goal1-SBML2BioPAX/sbml2biopax](https://bitbucket.org/armish/gsoc14/src/default/Goal1-SBML2BioPAX/sbml2biopax/?at=default):
+After checking out the repository, change your working directory to there:
 
-	$ cd Goal1-SBML2BioPAX/sbml2biopax
+	$ cd reconx-to-biopax
 
 To compile the code and create an executable JAR file, run ant:
 
