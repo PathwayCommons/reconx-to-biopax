@@ -1,7 +1,7 @@
 # reconx-to-biopax
 Originated from https://bitbucket.org/armish/gsoc14 and will continue here (ToDo).
 
-This is an SBML to BioPAX Level3 converter, specific to Recon2 data/model.
+## SBML to BioPAX Level3 converter, specific to the Recon2 data/model.
 
 Although there already existed an [SBML-to-BioPAX converter](https://sourceforge.net/apps/mediawiki/sbfc/index.php?title=Main_Page#SBML_to_BioPax), the produced BioPAX does not validate via the official BioPAX Validator and contain semantic errors, hindering its import into PC. For this part of the project, I will fix the SBML-to-BioPAX converter and make sure that it produces a valid BioPAX file with proper external identification information. 
 
