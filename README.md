@@ -20,7 +20,7 @@ See the initial changesets starting from tag `base1` till `milestone1.1`.
 To keep things much simpler, I (Arman) created a new project from the scratch under `Goal1-SBML2BioPAX/sbml2biopax`.
 This project depends on two libraries: Paxtools and JSBML.
 I implemented the converter so that this project can be used a library by other projects as well.
-The main class of this project, `SBML2BioPAXMain`, serves as an example to show how to use this API:
+The main class of this project, `ReconxToBiopaxConverter`, serves as an example to show how to use this API:
 
 	//java
 	// ...
@@ -31,8 +31,8 @@ The main class of this project, `SBML2BioPAXMain`, serves as an example to show 
 	// ...
 
 During implementation, I tried to seperate utility methods and main flow as much as possible,
-so that we have all main conversion logic in the `SBML2BioPAXConverter` class and
-all utility methods in the `SBML2BioPAXUtilities`.
+so that we have all main conversion logic in the `SbmlToBiopaxConverter` class and
+all utility methods in the `SbmlToBiopaxUtils`.
 
 The logic of the conversion is as follows:
 
