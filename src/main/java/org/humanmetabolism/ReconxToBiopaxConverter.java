@@ -18,7 +18,7 @@ public class ReconxToBiopaxConverter {
 
     public static void main(String[] args) throws IOException, XMLStreamException {
         if(args.length < 2) {
-            System.err.println("Usage: SBML2BioPAX input.sbml output.owl");
+            System.err.println("Usage: ReconxToBiopaxConverter input.sbml output.owl");
             System.exit(-1);
         }
 

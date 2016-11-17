@@ -8,3 +8,4 @@
 *.war
 jsbml.log
 /target/
+/out/

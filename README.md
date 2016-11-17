@@ -1,5 +1,5 @@
 # reconx-to-biopax
-Originated from https://bitbucket.org/armish/gsoc14 and will continue here (ToDo).
+Originated from Arman's https://bitbucket.org/armish/gsoc14 and will continue here (ToDo).
 
 ## SBML to BioPAX Level3 converter, specific to the Recon2 data/model.
 
@@ -17,20 +17,19 @@ This being said, the converter was not making good use of all Paxtools utilities
 I first tried to modify the existing code, but stuck with library conflicts and was not able to resolve the problems.
 See the initial changesets starting from tag `base1` till `milestone1.1`.
 
-To keep things much simpler, I (Arman) created a new project from the scratch under `Goal1-SBML2BioPAX/sbml2biopax`.
-This project depends on two libraries: Paxtools and JSBML.
-I implemented the converter so that this project can be used a library by other projects as well.
+To keep things much simpler, we created a new project from the scratch. This project depends on Paxtools and JSBML libraries.
+We implemented the converter so that this project can be used as a library by other projects as well.
 The main class of this project, `ReconxToBiopaxConverter`, serves as an example to show how to use this API:
 
 	//java
 	// ...
 	SBMLDocument sbmlDocument = SBMLReader.read(new File(sbmlFile));
-	SBML2BioPAXConverter sbml2BioPAXConverter = new SBML2BioPAXConverter();
-	Model bpModel = sbml2BioPAXConverter.convert(sbmlDocument);
+	SbmlToBiopaxConverter converter = new SbmlToBiopaxConverter();
+	Model bpModel = converter.convert(sbmlDocument);
 	// where bpModel is the BioPAX model
 	// ...
 
-During implementation, I tried to seperate utility methods and main flow as much as possible,
+During implementation, we separated utility methods and main flow as much as possible,
 so that we have all main conversion logic in the `SbmlToBiopaxConverter` class and
 all utility methods in the `SbmlToBiopaxUtils`.
 
@@ -63,21 +62,24 @@ After checking out the repository, change your working directory to there:
 
 	$ cd reconx-to-biopax
 
-To compile the code and create an executable JAR file, run ant:
+Build - create an executable JAR file:
 
-	$ ant
+	$ mvn clean package
 
 You can then run the converter as follows:
 
-	$ java -jar out/jar/sbml2biopax/sbml2biopax.jar 
-	> Usage: SBML2BioPAX input.sbml output.owl
+	$ java -jar target/reconx-to-biopax.jar 
+	> Usage: ReconxToBiopaxConverter input.sbml output.owl
 
-To test the application, you can download the Recon 2 model either from the corresponding [BioModel page](http://www.ebi.ac.uk/biomodels-main/MODEL1109130000) or from this project's download page: [goal1_input_recon2.sbml.gz](https://bitbucket.org/armish/gsoc14/downloads/goal1_input_recon2.sbml.gz).
+To test the application, you can download the Recon 2 (SBML) model either from the corresponding [BioModel page](http://www.ebi.ac.uk/biomodels-main/MODEL1109130000) 
+or from this project's download page: [goal1_input_recon2.sbml.gz](https://bitbucket.org/armish/gsoc14/downloads/goal1_input_recon2.sbml.gz).
+**Note:** one could download the BioPAX L3 model from the MODEL1109130000 BioModel page, but that model is not good for importing into Pathway Commons due to quite incomplete, simplified mapping from SBML...
+
 The following commands, for example, convert this file into BioPAX:
 
 	$ wget https://bitbucket.org/armish/gsoc14/downloads/goal1_input_recon2.sbml.gz	
 	$ gunzip goal1_input_recon2.sbml.gz
-	$ java -jar out/jar/sbml2biopax/sbml2biopax.jar goal1_input_recon2.sbml goal1_output_recon2.owl
+	$ java -jar target/reconx-to-biopax.jar goal1_input_recon2.sbml goal1_output_recon2.owl
 
 For sample output, you can check [goal1_output20140529.owl.gz](https://bitbucket.org/armish/gsoc14/downloads/goal1_output20140529.owl.gz).
 
