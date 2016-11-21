@@ -1,56 +1,61 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>pathwaycommons</groupId>
-  <artifactId>reconx-to-biopax</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <name>reconx-to-biopax</name>
+    <groupId>pathwaycommons</groupId>
+    <artifactId>reconx-to-biopax</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>reconx-to-biopax</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <paxtools.version>5.0.0-beta1</paxtools.version>
-      <slf4j.version>1.7.7</slf4j.version>
-  </properties>
+    <description>
+        Recon2 SBML to BioPAX Level3 data converter.
+    </description>
 
-    <repositories>
-        <!--<repository>-->
-            <!--<id>ossrh</id>-->
-            <!--<name>OSSRH Repository</name>-->
-            <!--<url>https://oss.sonatype.org/content/groups/public/</url>-->
-        <!--</repository>-->
-        <repository>
-              <id>jsbml</id>
-              <url>http://jsbml.sourceforge.net/m2repo</url>
-        </repository>
-        <repository>
-              <id>jsbml-snapshots</id>
-              <url>http://jsbml.sourceforge.net/m2repo_snapshots</url>
-        </repository>
-    </repositories>
+    <url>https://biopax.github.io/PathwayCommons/${project.name}</url>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.biopax.paxtools</groupId>
-            <artifactId>paxtools-core</artifactId>
-            <version>${paxtools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.biopax.paxtools</groupId>
-            <artifactId>paxtools-trove</artifactId>
-            <version>${paxtools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sbml.jsbml</groupId>
-            <artifactId>jsbml-core</artifactId>
-            <version>1.2-beta1</version>
-        </dependency>
-  </dependencies>
+    <organization>
+        <name>Pathway Commons</name>
+        <url>http://www.pathwaycommons.org</url>
+    </organization>
+
+    <mailingLists>
+        <mailingList>
+            <name>Pathway Commons Help</name>
+            <post>pathway-commons-help@googlegroups.com</post>
+        </mailingList>
+    </mailingLists>
+
+    <licenses>
+        <license>
+            <name>LGPL 2.0 license</name>
+            <url>http://www.gnu.org/licenses/lgpl-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/PathwayCommons/${project.name}.git</connection>
+        <developerConnection>scm:git:git@github.com:PathwayCommons/${project.name}.git</developerConnection>
+        <url>https://github.com/PathwayCommons/${project.name}</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/PathwayCommons/${project.name}/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/PathwayCommons/${project.name}</url>
+    </ciManagement>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <paxtools.version>5.0.0-beta1</paxtools.version>
+        <slf4j.version>1.7.7</slf4j.version>
+        <github.global.server>github</github.global.server>
+    </properties>
 
     <build>
         <pluginManagement>
@@ -65,6 +70,18 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.8</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-scm</artifactId>
+                <version>2.8</version>
+            </extension>
+        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -90,4 +107,116 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!-- manual releasing: mvn clean deploy -P sonatype-release -->
+            <id>sonatype-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <downloadUrl>http://www.pathwaycommons.org/archives/</downloadUrl>
+    </distributionManagement>
+
+
+    <repositories>
+        <!--<repository>-->
+            <!--<id>ossrh</id>-->
+            <!--<name>OSSRH Repository</name>-->
+            <!--<url>https://oss.sonatype.org/content/groups/public/</url>-->
+        <!--</repository>-->
+        <repository>
+            <id>jsbml</id>
+            <url>http://jsbml.sourceforge.net/m2repo</url>
+        </repository>
+        <repository>
+            <id>jsbml-snapshots</id>
+            <url>http://jsbml.sourceforge.net/m2repo_snapshots</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.biopax.paxtools</groupId>
+            <artifactId>paxtools-core</artifactId>
+            <version>${paxtools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.biopax.paxtools</groupId>
+            <artifactId>paxtools-trove</artifactId>
+            <version>${paxtools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sbml.jsbml</groupId>
+            <artifactId>jsbml-core</artifactId>
+            <version>1.2-beta1</version>
+        </dependency>
+    </dependencies>
 </project>
