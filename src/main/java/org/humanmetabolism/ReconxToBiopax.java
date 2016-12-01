@@ -13,12 +13,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ReconxToBiopaxConverter {
-    private static Logger log = LoggerFactory.getLogger(ReconxToBiopaxConverter.class);
+public class ReconxToBiopax {
+    private static Logger log = LoggerFactory.getLogger(ReconxToBiopax.class);
 
     public static void main(String[] args) throws IOException, XMLStreamException {
         if(args.length < 2) {
-            System.err.println("Usage: ReconxToBiopaxConverter input.sbml output.owl");
+            System.err.println("Usage: ReconxToBiopax input.sbml output.owl");
             System.exit(-1);
         }
 

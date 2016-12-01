@@ -31,7 +31,7 @@ To keep things much simpler, we created a new project from the scratch.
 This project depends on Paxtools and JSBML libraries.
 We implemented the converter so that this project can be used as a 
 library by other projects as well.
-The main class of this project, `ReconxToBiopaxConverter`, serves as an 
+The main class of this project, `ReconxToBiopax`, serves as an 
 example to show how to use this API:
 
 	//java
@@ -50,14 +50,14 @@ The logic of the conversion is as follows:
 
 1. Load SBML document.
 2. Get the parent model in the document.
-3. Convert SBML::model to BioPAX::Pathway.
+3. Convert SBML::model to BioPAX::Pathway. ToDo: make it optional; create Provenance (instead).
 4. Iterate over all reactions within SBML::model.
 	1. Convert SBML::reaction to BioPAX::Conversion.
 	2. Convert all SBML::modifiers to this reaction into BioPAX::Control reactions.
 	3. Convert all SBML::reactants to BioPAX::leftParticipants.
 	4. Convert all SBML::products to BioPAX::rightParticipants.
 	5. If SBML::reaction::isReversible, make BioPAX::Conversion reversible as well.
-	6. Add all reactions to the parent pathway.
+	6. Add all reactions to the parent pathway. ToDo: make optional; define dataSource property for all Entities.
 5. Fix outstanding issues with the model and complete it by adding missing components.
 
 One key thing with this conversion is that, often, external knowledge 
@@ -86,7 +86,7 @@ Build - create an executable JAR file:
 You can then run the converter as follows:
 
 	$ java -jar target/reconx-to-biopax.jar 
-	> Usage: ReconxToBiopaxConverter input.sbml output.owl
+	> Usage: ReconxToBiopax input.sbml output.owl
 
 To test the application, you can download the _SBML Level2 v4 (with URNs)_ 
 model either from the corresponding [BioModel page](http://www.ebi.ac.uk/biomodels-main/MODEL1109130000).
@@ -98,7 +98,7 @@ The following commands, for example, convert this file into BioPAX:
 
 	$ wget https://bitbucket.org/armish/gsoc14/downloads/goal1_input_recon2.sbml.gz	
 	$ gunzip goal1_input_recon2.sbml.gz
-	$ java -jar target/reconx-to-biopax.jar goal1_input_recon2.sbml goal1_output_recon2.owl
+	$ java -Xmx16g -jar target/reconx-to-biopax.jar goal1_input_recon2.sbml goal1_output_recon2.owl
 
 For sample output, you can check [goal1_output20140529.owl.gz](https://bitbucket.org/armish/gsoc14/downloads/goal1_output20140529.owl.gz).
 

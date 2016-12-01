@@ -96,7 +96,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.humanmetabolism.ReconxToBiopaxConverter</mainClass>
+                                    <mainClass>org.humanmetabolism.ReconxToBiopax</mainClass>
                                 </transformer>
                             </transformers>
                             <finalName>reconx-to-biopax</finalName>
