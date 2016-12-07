@@ -17,13 +17,19 @@ public class ReconxToBiopax {
     private static Logger log = LoggerFactory.getLogger(ReconxToBiopax.class);
 
     public static void main(String[] args) throws IOException, XMLStreamException {
+        boolean makePathway = false; //default - won't create top model all-interactions pathway
+
         if(args.length < 2) {
-            System.err.println("Usage: ReconxToBiopax input.sbml output.owl");
+            System.err.println("Usage: ReconxToBiopax input.sbml output.owl [--pathway]\n" +
+                    "Optional parameters:\n" +
+                    "--pathway\tcreate a root model Pathway that simply contains all the interactions");
             System.exit(-1);
         }
 
-        String sbmlFile = args[0],
-                bpFile = args[1];
+        String sbmlFile = args[0];
+        String bpFile = args[1];
+        if(args.length > 2 && args[2].equals("--pathway"))
+            makePathway = true;
 
         log.info("Reading SBML file: " + sbmlFile);
         SBMLDocument sbmlDocument = SBMLReader.read(new File(sbmlFile));
@@ -31,6 +37,7 @@ public class ReconxToBiopax {
 
         log.info("Converting SBML model to BioPAX...");
         SbmlToBiopaxConverter sbmlToBiopaxConverter = new SbmlToBiopaxConverter();
+        sbmlToBiopaxConverter.setMakePathway(makePathway);
         Model bpModel = sbmlToBiopaxConverter.convert(sbmlDocument);
 
         log.info("Saving BioPAX model to " + bpFile);

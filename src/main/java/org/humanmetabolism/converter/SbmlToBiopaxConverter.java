@@ -9,6 +9,19 @@ import org.slf4j.LoggerFactory;
 public class SbmlToBiopaxConverter {
     private static Logger log = LoggerFactory.getLogger(SbmlToBiopaxConverter.class);
     private final SbmlToBiopaxUtils sbmlToBiopaxUtils = new SbmlToBiopaxUtils();
+    private boolean makePathway = false;
+
+    /**
+     * Whether to generate the model's root pathway that contains all the interactions.
+     *
+     * @return true/false
+     */
+    public boolean isMakePathway() {
+        return makePathway;
+    }
+    public void setMakePathway(boolean makePathway) {
+        this.makePathway = makePathway;
+    }
 
     public Model convert(SBMLDocument sbmlDocument) {
         return convert(sbmlDocument.getModel());
@@ -19,8 +32,10 @@ public class SbmlToBiopaxConverter {
 
         final Provenance provenance = sbmlToBiopaxUtils.convertProvenance(bpModel,sbmlModel);
 
-        // create a Pathway that corresponds to this SBML model TODO: make optional or remove
-//        Pathway pathway = sbmlToBiopaxUtils.convertPathway(bpModel, sbmlModel);
+        // create a Pathway that corresponds to this SBML model (optional)
+        Pathway pathway = null;
+        if(makePathway)
+            pathway = sbmlToBiopaxUtils.convertPathway(bpModel, sbmlModel);
 
         // Reactions -> Conversions [start]
         ListOf<Reaction> sbmlReactions = sbmlModel.getListOfReactions();
@@ -29,7 +44,7 @@ public class SbmlToBiopaxConverter {
         for (Reaction reaction : sbmlReactions) {
             log.trace("Working on reaction conversion: " + reaction.getName());
             Conversion conversion = sbmlToBiopaxUtils.convertReaction(bpModel, reaction);
-//            pathway.addPathwayComponent(conversion);
+            if(makePathway) pathway.addPathwayComponent(conversion);
 
             // Modifiers -> Control reactions [start]
             ListOf<ModifierSpeciesReference> listOfModifiers = reaction.getListOfModifiers();
@@ -38,7 +53,7 @@ public class SbmlToBiopaxConverter {
 
             for (ModifierSpeciesReference modifierSpeciesReference : listOfModifiers) {
                 Control control = sbmlToBiopaxUtils.convertModifier(bpModel, modifierSpeciesReference);
-//                pathway.addPathwayComponent(control);
+                if(makePathway) pathway.addPathwayComponent(control);
                 control.addControlled(conversion);
                 Species species = sbmlModel.getSpecies(modifierSpeciesReference.getSpecies());
                 Controller controller = sbmlToBiopaxUtils.convertSpecies(bpModel, species);
