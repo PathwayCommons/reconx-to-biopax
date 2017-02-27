@@ -52,8 +52,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <paxtools.version>5.0.0-beta1</paxtools.version>
+        <paxtools.version>5.0.0-SNAPSHOT</paxtools.version>
         <slf4j.version>1.7.7</slf4j.version>
+        <logback.version>1.1.2</logback.version>
         <github.global.server>github</github.global.server>
     </properties>
 
@@ -182,11 +183,11 @@
 
 
     <repositories>
-        <!--<repository>-->
-            <!--<id>ossrh</id>-->
-            <!--<name>OSSRH Repository</name>-->
-            <!--<url>https://oss.sonatype.org/content/groups/public/</url>-->
-        <!--</repository>-->
+        <repository>
+            <id>ossrh</id>
+            <name>OSSRH Repository</name>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
         <repository>
             <id>jsbml</id>
             <url>http://jsbml.sourceforge.net/m2repo</url>
@@ -209,14 +210,52 @@
             <version>${paxtools.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.sbml.jsbml</groupId>
+            <artifactId>jsbml-core</artifactId>
+            <version>1.2-beta1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>jcl-over-slf4j</artifactId>-->
+            <!--<version>${slf4j.version}</version>-->
+            <!--<scope>runtime</scope>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>jul-to-slf4j</artifactId>-->
+            <!--<version>${slf4j.version}</version>-->
+            <!--<scope>runtime</scope>-->
+            <!--<optional>true</optional>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.sbml.jsbml</groupId>
-            <artifactId>jsbml-core</artifactId>
-            <version>1.2-beta1</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
