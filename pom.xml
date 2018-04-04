@@ -4,7 +4,7 @@
 
     <groupId>pathwaycommons</groupId>
     <artifactId>reconx-to-biopax</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <name>reconx-to-biopax</name>
 
     <description>
@@ -188,14 +188,6 @@
             <name>OSSRH Repository</name>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>jsbml</id>
-            <url>http://jsbml.sourceforge.net/m2repo</url>
-        </repository>
-        <repository>
-            <id>jsbml-snapshots</id>
-            <url>http://jsbml.sourceforge.net/m2repo_snapshots</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -212,7 +204,7 @@
         <dependency>
             <groupId>org.sbml.jsbml</groupId>
             <artifactId>jsbml-core</artifactId>
-            <version>1.2-beta1</version>
+            <version>1.3.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -229,20 +221,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>jcl-over-slf4j</artifactId>-->
-            <!--<version>${slf4j.version}</version>-->
-            <!--<scope>runtime</scope>-->
-            <!--<optional>true</optional>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>jul-to-slf4j</artifactId>-->
-            <!--<version>${slf4j.version}</version>-->
-            <!--<scope>runtime</scope>-->
-            <!--<optional>true</optional>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
