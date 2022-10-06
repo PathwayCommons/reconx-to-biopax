@@ -1,6 +1,9 @@
 # reconx-to-biopax
 Originated from Arman's https://bitbucket.org/armish/gsoc14 and will continue here (ToDo).
 
+![Build](https://github.com/PathwayCommons/reconx-to-biopax/actions/workflows/maven.yml/badge.svg?branch=master)
+
+
 ## SBML to BioPAX Level3 converter, specific to the Recon2 data/model.
 Although there already existed an 
 [SBML-to-BioPAX converter](https://sourceforge.net/apps/mediawiki/sbfc/index.php?title=Main_Page#SBML_to_BioPax), 
