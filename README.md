@@ -1,8 +1,7 @@
 # reconx-to-biopax
-Originated from Arman's https://bitbucket.org/armish/gsoc14 and will continue here (ToDo).
+Originated from Arman's https://bitbucket.org/armish/gsoc14
 
 [![Java CI with Maven](https://github.com/PathwayCommons/reconx-to-biopax/actions/workflows/maven.yml/badge.svg)](https://github.com/PathwayCommons/reconx-to-biopax/actions/workflows/maven.yml)
-
 
 ## SBML to BioPAX Level3 converter, specific to the Recon2 data/model.
 Although there already existed an 
@@ -38,12 +37,8 @@ The main class of this project, `ReconxToBiopax`, serves as an
 example to show how to use this API:
 
 	//java
-	// ...
-	SBMLDocument sbmlDocument = SBMLReader.read(new File(sbmlFile));
 	SbmlToBiopaxConverter converter = new SbmlToBiopaxConverter();
-	Model bpModel = converter.convert(sbmlDocument);
-	// where bpModel is the BioPAX model
-	// ...
+	Model bpModel = converter.convert(new File(sbmlFile)); //can also be an InputStream
 
 During implementation, we separated utility methods and main flow as 
 much as possible, so that we have all main conversion logic in the 

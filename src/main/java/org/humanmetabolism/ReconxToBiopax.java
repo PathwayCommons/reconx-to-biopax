@@ -4,7 +4,6 @@ import org.humanmetabolism.converter.SbmlToBiopaxConverter;
 import org.biopax.paxtools.io.SimpleIOHandler;
 import org.biopax.paxtools.model.BioPAXLevel;
 import org.biopax.paxtools.model.Model;
-import org.sbml.jsbml.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,17 +27,14 @@ public class ReconxToBiopax {
 
         String sbmlFile = args[0];
         String bpFile = args[1];
-        if(args.length > 2 && args[2].equals("--pathway"))
+        if(args.length > 2 && args[2].equals("--pathway")) {
             makePathway = true;
-
-        log.info("Reading SBML file: " + sbmlFile);
-        SBMLDocument sbmlDocument = SBMLReader.read(new File(sbmlFile));
-        log.info("SBML model loaded: " + sbmlDocument.getModel().getNumReactions() + " reactions in it.");
+        }
 
         log.info("Converting SBML model to BioPAX...");
         SbmlToBiopaxConverter sbmlToBiopaxConverter = new SbmlToBiopaxConverter();
         sbmlToBiopaxConverter.setMakePathway(makePathway);
-        Model bpModel = sbmlToBiopaxConverter.convert(sbmlDocument);
+        Model bpModel = sbmlToBiopaxConverter.convert(new File(sbmlFile));
 
         log.info("Saving BioPAX model to " + bpFile);
         SimpleIOHandler bpHandler = new SimpleIOHandler(BioPAXLevel.L3);

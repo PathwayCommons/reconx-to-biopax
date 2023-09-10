@@ -6,6 +6,11 @@ import org.sbml.jsbml.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class SbmlToBiopaxConverter {
     private static Logger log = LoggerFactory.getLogger(SbmlToBiopaxConverter.class);
     private final SbmlToBiopaxUtils sbmlToBiopaxUtils = new SbmlToBiopaxUtils();
@@ -21,6 +26,14 @@ public class SbmlToBiopaxConverter {
     }
     public void setMakePathway(boolean makePathway) {
         this.makePathway = makePathway;
+    }
+
+    public Model convert(InputStream sbmlInputStream) throws XMLStreamException {
+        return convert(SBMLReader.read(sbmlInputStream));
+    }
+
+    public Model convert(File sbmlFile) throws XMLStreamException, IOException {
+        return convert(SBMLReader.read(sbmlFile));
     }
 
     public Model convert(SBMLDocument sbmlDocument) {

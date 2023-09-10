@@ -4,7 +4,7 @@
 
     <groupId>pathwaycommons</groupId>
     <artifactId>reconx-to-biopax</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>reconx-to-biopax</name>
 
     <description>
@@ -50,7 +50,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <paxtools.version>5.3.0-SNAPSHOT</paxtools.version>
+        <paxtools.version>6.0.0-SNAPSHOT</paxtools.version>
         <github.global.server>github</github.global.server>
     </properties>
 
@@ -59,9 +59,9 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                     <configuration>
-                        <release>8</release>
+                        <release>17</release>
                     </configuration>
                 </plugin>
             </plugins>
@@ -70,19 +70,19 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh</artifactId>
-                <version>2.8</version>
+                <version>3.5.3</version>
             </extension>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-scm</artifactId>
-                <version>2.8</version>
+                <version>3.5.3</version>
             </extension>
         </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -113,7 +113,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
@@ -121,6 +121,7 @@
                         </configuration>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <version>3.2.1</version>
                         <executions>
@@ -133,8 +134,9 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.5.0</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -145,6 +147,7 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.6</version>
                         <executions>
@@ -194,7 +197,7 @@
         <dependency>
             <groupId>org.sbml.jsbml</groupId>
             <artifactId>jsbml-core</artifactId>
-            <version>1.3.1</version>
+            <version>1.6.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -204,24 +207,32 @@
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.woodstox</groupId>
+                    <artifactId>woodstox-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.thoughtworks.xstream</groupId>
+                    <artifactId>xstream</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>2.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.25</version>
+            <version>2.0.7</version>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.11</version>
+            <version>1.4.11</version>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
