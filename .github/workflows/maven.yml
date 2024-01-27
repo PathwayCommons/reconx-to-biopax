@@ -11,7 +11,7 @@ on:
       - master
 
 jobs:
-  build-with-jdk17:
+  build-maven-jdk20:
     runs-on: ubuntu-latest
     env:
       JDK_JAVA_OPTIONS: "--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
