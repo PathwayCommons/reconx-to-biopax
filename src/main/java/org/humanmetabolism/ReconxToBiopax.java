@@ -31,14 +31,14 @@ public class ReconxToBiopax {
             makePathway = true;
         }
 
-        log.info("Converting SBML model to BioPAX...");
+        log.info("Converting the SBML model to BioPAX...");
         SbmlToBiopaxConverter sbmlToBiopaxConverter = new SbmlToBiopaxConverter();
         sbmlToBiopaxConverter.setMakePathway(makePathway);
+        sbmlToBiopaxConverter.biopaxModelXmlBase("reconx:");
         Model bpModel = sbmlToBiopaxConverter.convert(new File(sbmlFile));
-
-        log.info("Saving BioPAX model to " + bpFile);
+        log.info("Saving the BioPAX model to " + bpFile);
         SimpleIOHandler bpHandler = new SimpleIOHandler(BioPAXLevel.L3);
         bpHandler.convertToOWL(bpModel, new FileOutputStream(bpFile));
-        log.info("Conversion completed.");
+        log.info("Completed!");
     }
 }

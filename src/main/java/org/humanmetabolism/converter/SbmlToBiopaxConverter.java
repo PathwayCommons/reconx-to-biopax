@@ -16,6 +16,10 @@ public class SbmlToBiopaxConverter {
     private final SbmlToBiopaxUtils sbmlToBiopaxUtils = new SbmlToBiopaxUtils();
     private boolean makePathway = false;
 
+    public void biopaxModelXmlBase(String xmlBase) {
+        sbmlToBiopaxUtils.setXmlBase(xmlBase);
+    }
+
     /**
      * Whether to generate the model's root pathway that contains all the interactions.
      *
@@ -43,7 +47,7 @@ public class SbmlToBiopaxConverter {
     private Model convert(org.sbml.jsbml.Model sbmlModel) {
         Model bpModel = sbmlToBiopaxUtils.createModel();
 
-        final Provenance provenance = sbmlToBiopaxUtils.convertProvenance(bpModel,sbmlModel);
+        final Provenance provenance = sbmlToBiopaxUtils.convertProvenance(bpModel, sbmlModel);
 
         // create a Pathway that corresponds to this SBML model (optional)
         Pathway pathway = null;

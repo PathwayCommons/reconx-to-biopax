@@ -1,5 +1,6 @@
 package org.humanmetabolism.converter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.biopax.paxtools.model.BioPAXFactory;
 import org.biopax.paxtools.model.BioPAXLevel;
 import org.biopax.paxtools.model.Model;
@@ -16,20 +17,24 @@ import java.util.*;
 public class SbmlToBiopaxUtils {
     private static Logger log = LoggerFactory.getLogger(SbmlToBiopaxUtils.class);
 
-    private BioPAXFactory bioPAXFactory = BioPAXLevel.L3.getDefaultFactory();
+    private BioPAXFactory bioPAXFactory;
+    private String xmlBase;
 
-    private String XMLBase = "http://www.humanmetabolism.org/#";
-
-    public String getXMLBase() {
-        return XMLBase;
+    public SbmlToBiopaxUtils() {
+        this.xmlBase = "";
+        this.bioPAXFactory = BioPAXLevel.L3.getDefaultFactory();
     }
 
-    public void setXMLBase(String XMLBase) {
-        this.XMLBase = XMLBase;
+    public String getXmlBase() {
+        return xmlBase;
+    }
+
+    public void setXmlBase(String xmlBase) {
+        this.xmlBase = (StringUtils.isBlank(xmlBase)) ? "" : xmlBase;
     }
 
     public String completeId(String partialId) {
-        return getXMLBase() + partialId;
+        return getXmlBase() + partialId;
     }
 
     public Pathway convertPathway(Model bpModel, org.sbml.jsbml.Model sbmlModel) {
@@ -42,15 +47,12 @@ public class SbmlToBiopaxUtils {
 
     public Provenance convertProvenance(Model bpModel, org.sbml.jsbml.Model sbmlModel) {
         Provenance p = createBPEfromSBMLE(bpModel, Provenance.class, sbmlModel,
-                "http://identifiers.org/biomodels.db/" + sbmlModel.getId());
-
+                "bioregistry.io/biomodels.db:" + sbmlModel.getId());
         for (Xref xref : generateXrefsForSBase(bpModel, RelationshipXref.class, sbmlModel)) {
             p.addXref(xref);
         }
-
-        final UnificationXref x = bpModel.addNew(UnificationXref.class,
-                bpModel.getXmlBase() + "xref_biomodels_" + sbmlModel.getId());
-        x.setDb("BioModels Database");
+        final UnificationXref x = bpModel.addNew(UnificationXref.class,"biomodels.db:" + sbmlModel.getId());
+        x.setDb("biomodels.db");
         x.setId(sbmlModel.getId());
         p.addXref(x);
 
@@ -60,7 +62,7 @@ public class SbmlToBiopaxUtils {
     public Model createModel() {
         Model model = bioPAXFactory.createModel();
         // This could change, would be great to make this configurable
-        model.setXmlBase(getXMLBase());
+        model.setXmlBase(getXmlBase());
         return model;
     }
 
@@ -110,9 +112,11 @@ public class SbmlToBiopaxUtils {
         return control;
     }
 
-    public <T extends SimplePhysicalEntity, S extends EntityReference> T convertSpeciesToSPE(Model bpModel, Class<T> entityClass, Class<S> refClass, Species species) {
+    public <T extends SimplePhysicalEntity, S extends EntityReference> T convertSpeciesToSPE(
+        Model bpModel, Class<T> entityClass, Class<S> refClass, Species species)
+    {
         Set<Xref> xrefs = generateXrefsForSBase(bpModel, UnificationXref.class, species);
-        HashSet<XReferrable> ers = new HashSet<XReferrable>();
+        HashSet<XReferrable> ers = new HashSet<>();
         for (Xref xref : xrefs) {
             for (XReferrable xReferrable : xref.getXrefOf()) {
                 // Only add the entity references
@@ -272,9 +276,9 @@ public class SbmlToBiopaxUtils {
     }
 
     public void fillComplexes(Model bpModel) {
-        HashMap<String, ProteinReference> xrefToProtein = new HashMap<String, ProteinReference>();
+        HashMap<String, ProteinReference> xrefToProtein = new HashMap<>();
         // Now let's use xrefs to find the complex components
-        // First, find the proteinrefs and map them with their xrefs
+        // First, find the protein refs and map them with their xrefs
         for (ProteinReference proteinRef : bpModel.getObjects(ProteinReference.class)) {
             for (Xref xref : proteinRef.getXref()) {
                 xrefToProtein.put(xref.toString(), proteinRef);
@@ -282,17 +286,16 @@ public class SbmlToBiopaxUtils {
         }
 
         // Now let's go to the complexes and see what xrefs they have
-        Set<Complex> complexes = new HashSet<Complex>(bpModel.getObjects(Complex.class));
+        Set<Complex> complexes = new HashSet<>(bpModel.getObjects(Complex.class));
         for (Complex complex : complexes) {
-            HashSet<String> names = new HashSet<String>(Arrays.asList(complex.getDisplayName().split(":")));
+            HashSet<String> names = new HashSet<>(Arrays.asList(complex.getDisplayName().split(":")));
 
             // Let's try to capture proteins from the model first
-            HashSet<Protein> components = new HashSet<Protein>();
+            HashSet<Protein> components = new HashSet<>();
             for (Xref xref : complex.getXref()) {
                 ProteinReference proteinRef = xrefToProtein.get(xref.toString());
                 if(proteinRef != null) {
                     String cProteinId = completeId(complex.getUri() + "_" + proteinRef.getUri());
-                    //TODO: make sure refactoring has gone correct here (compare, test vs. prev. revision...)
                     if(!bpModel.containsID(cProteinId)) {
                         Protein protein = bpModel.addNew(Protein.class, cProteinId);
                         protein.setDisplayName(proteinRef.getDisplayName());
@@ -308,7 +311,6 @@ public class SbmlToBiopaxUtils {
             // Let's create proteins for them
             for (String name : names) {
                 final String nameBasedURI = completeId("protein_" + name);
-                //TODO: make sure refactoring here was correct (removed 'newBPEs' intermediate map)
                 Protein protein = (Protein) bpModel.getByID(nameBasedURI);
                 if(protein == null) {
                     protein = bpModel.addNew(Protein.class, nameBasedURI);
@@ -324,15 +326,15 @@ public class SbmlToBiopaxUtils {
                     proteinReference.setStandardName(name);
                 }
 
-                String xrefId = completeId("symbol_" + name);
-                UnificationXref unificationXref = (UnificationXref) bpModel.getByID(xrefId);
-                if(unificationXref == null) {
-                    unificationXref = bpModel.addNew(UnificationXref.class, xrefId);
-                    unificationXref.setDb("HGNC Symbol");
-                    unificationXref.setId(name);
+                String u = completeId("symbol_" + name);
+                RelationshipXref rx = (RelationshipXref) bpModel.getByID(u);
+                if(rx == null) {
+                    rx = bpModel.addNew(RelationshipXref.class, u);
+                    rx.setDb("hgnc.symbol");
+                    rx.setId(name);
                 }
 
-                proteinReference.addXref(unificationXref);
+                proteinReference.addXref(rx);
                 protein.setEntityReference(proteinReference);
                 components.add(protein);
             }
@@ -349,18 +351,18 @@ public class SbmlToBiopaxUtils {
 
     public void assignOrganism(Model bpModel) {
         // Since this is RECON2, everything is human
-        BioSource bioSource = bpModel.addNew(BioSource.class, "http://identifiers.org/taxonomy/9606");
+        BioSource bioSource = bpModel.addNew(BioSource.class, "bioregistry.io/ncbitaxon:9606");
         bioSource.setDisplayName("Homo sapiens");
         bioSource.setStandardName("Homo sapiens");
-        UnificationXref unificationXref = bpModel.addNew(UnificationXref.class, completeId("xref_taxonomy_9606"));
-        unificationXref.setDb("Taxonomy");
+        UnificationXref unificationXref = bpModel.addNew(UnificationXref.class, "ncbitaxon:9606");
+        unificationXref.setDb("ncbitaxon");
         unificationXref.setId("9606");
         bioSource.addXref(unificationXref);
 
         for (SequenceEntityReference ser : bpModel.getObjects(SequenceEntityReference.class)) {
             ser.setOrganism(bioSource);
         }
-        for (Gene g : bpModel.getObjects(Gene.class)) { //but, there're probably no Gene objects...
+        for (Gene g : bpModel.getObjects(Gene.class)) { //but, there are probably no Gene objects...
             g.setOrganism(bioSource);
         }
         for (Pathway p : bpModel.getObjects(Pathway.class)) {
